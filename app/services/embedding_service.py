@@ -11,15 +11,33 @@ def embed_chunks(chunks: List[Document]) -> List[dict]:
     results = []
 
     for idx, chunk in enumerate(chunks):
-        logger.info("Embedding chunk %d", idx + 1)
+        text = chunk.page_content.strip()
 
-        embedding = client.embed_text(chunk.page_content)
+        if not text:
+            logger.warning("Skipping empty chunk at index %d", idx)
+            continue
 
-        logger.info("Embedding dimension: %d", len(embedding))
+        embedding = client.embed_text(text)
+
+        if embedding is None:
+            logger.error("Embedding returned None at index %d", idx)
+            continue
+
+        if not isinstance(embedding, list):
+            logger.error("Embedding is not a list at index %d", idx)
+            continue
+
+        if len(embedding) != 1024:
+            logger.error(
+                "Embedding dimension mismatch at index %d: got %d",
+                idx,
+                len(embedding),
+            )
+            continue
 
         results.append({
             "embedding": embedding,
-            "text": chunk.page_content,
+            "text": text,
             "metadata": chunk.metadata,
         })
 

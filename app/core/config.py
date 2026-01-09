@@ -6,6 +6,11 @@ class Settings(BaseSettings):
     S3_BUCKET: str
     LOCAL_PDF_DIR: str
     EMBEDDING_MODEL_ID: str
+    OPENSEARCH_COLLECTION_ENDPOINT: str
+    OPENSEARCH_INDEX: str
+    Access_Key:str
+    Secret_Access_Key:str
+
 
     class Config:
         env_file= ".env"
