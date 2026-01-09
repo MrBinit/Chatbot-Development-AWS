@@ -1,0 +1,11 @@
+llm:
+  model_id: amazon.nova-lite-v1:0
+  generation:
+    temperature: 0.2
+    top_p: 0.9
+    max_tokens: 500
+
+retrieval:
+  top_k: 5
+  knn_k: 10
+  bm25_boost: 2.0

@@ -1,18 +1,30 @@
-# Hybrid search 
+# Hybrid search
 from app.infra.opensearch_client import get_opensearch_client
 from app.infra.bedrock_embedding_client import EmbeddingBedrockClient
-from app.core.config import settings
+from app.core.config_loader import load_app_config, load_llm_config
+
+# Load once (cached)
+app_config = load_app_config()
+llm_config = load_llm_config()
+
+OPENSEARCH_INDEX = app_config["opensearch"]["index"]
+RETRIEVAL_CFG = llm_config["retrieval"]
+
 
 class SearchService:
     def __init__(self):
         self.os_client = get_opensearch_client()
         self.embed_client = EmbeddingBedrockClient()
 
-    def hybrid_search(self, query: str, top_k: int = 5):
+    def hybrid_search(self, query: str, top_k: int | None = None):
         embedding = self.embed_client.embed_text(query)
 
+        k = top_k or RETRIEVAL_CFG["top_k"]
+        knn_k = RETRIEVAL_CFG.get("knn_k", k)
+        bm25_boost = RETRIEVAL_CFG.get("bm25_boost", 2.0)
+
         body = {
-            "size": top_k,
+            "size": k,
             "query": {
                 "bool": {
                     "should": [
@@ -20,7 +32,7 @@ class SearchService:
                             "knn": {
                                 "embedding": {
                                     "vector": embedding,
-                                    "k": top_k
+                                    "k": knn_k,
                                 }
                             }
                         },
@@ -28,7 +40,7 @@ class SearchService:
                             "match": {
                                 "content": {
                                     "query": query,
-                                    "boost": 2.0
+                                    "boost": bm25_boost,
                                 }
                             }
                         }
@@ -38,6 +50,6 @@ class SearchService:
         }
 
         return self.os_client.search(
-            index=settings.OPENSEARCH_INDEX,
-            body=body
+            index=OPENSEARCH_INDEX,
+            body=body,
         )

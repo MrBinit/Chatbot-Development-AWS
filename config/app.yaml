@@ -1,0 +1,12 @@
+aws:
+  region: us-east-1
+
+storage:
+  s3_bucket: binit-pdf-storer
+  local_pdf_dir: ./data/pdfs
+
+embedding:
+  model_id: amazon.titan-embed-text-v2:0
+
+opensearch:
+  index: rag-index

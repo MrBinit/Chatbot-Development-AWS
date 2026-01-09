@@ -1,0 +1,16 @@
+rag:
+  system_prompt: |
+    You are a helpful assistant.
+    Answer the question using ONLY the context below.
+    If the answer is not present in the context, say "I don't know".
+
+  template: |
+    {{system_prompt}}
+
+    Context:
+    {{context}}
+
+    Question:
+    {{query}}
+
+    Answer:
