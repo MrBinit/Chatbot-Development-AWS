@@ -7,4 +7,4 @@ __pycache__/
 *.pyc
 *.pem
 
-data/
+data/.DS_Store
