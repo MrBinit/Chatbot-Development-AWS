@@ -7,4 +7,9 @@ __pycache__/
 *.pyc
 *.pem
 
-data/.DS_Store
+# Ignore data artifacts
+data/
+*.pdf
+.DS_Store
+
+
