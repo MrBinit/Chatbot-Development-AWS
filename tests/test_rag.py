@@ -1,13 +1,31 @@
-import asyncio
-from app.services.rag_service import RAGService
+import pytest
 
-async def main():
-    rag = RAGService()
-    query = "What is the National AI Policy about?"
-    answer = await rag.answer(query, top_k=5)
+@pytest.mark.asyncio
+async def test_rag_requires_auth(async_client):
+    resp = await async_client.post(
+        "/rag/answer",
+        json={"query": "What is AI?"},
+    )
 
-    print("\n=== RAG ANSWER ===")
-    print(answer)
+    # No token → 401 Unauthorized (CORRECT)
+    assert resp.status_code == 401
 
-if __name__ == "__main__":
-    asyncio.run(main())
+
+@pytest.mark.asyncio
+async def test_rag_with_auth(async_client):
+    # Login first
+    login = await async_client.post(
+        "/auth/login",
+        json={"username": "admin", "password": "admin123"},
+    )
+    token = login.json()["access_token"]
+
+    # Call RAG with token
+    resp = await async_client.post(
+        "/rag/answer",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"query": "What is the National AI Policy?"},
+    )
+
+    assert resp.status_code == 200
+    assert "answer" in resp.json()
