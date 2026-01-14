@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   api:
-    build: .
+    image: 173763384281.dkr.ecr.us-east-1.amazonaws.com/chatbot-api:latest
     container_name: chatbot-api
     ports:
       - "8000:8000"
