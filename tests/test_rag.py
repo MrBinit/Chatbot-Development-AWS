@@ -1,4 +1,6 @@
+# tests/test_rag.py
 import pytest
+
 
 @pytest.mark.asyncio
 async def test_rag_requires_auth(async_client):
@@ -7,20 +9,19 @@ async def test_rag_requires_auth(async_client):
         json={"query": "What is AI?"},
     )
 
-    # No token → 401 Unauthorized (CORRECT)
     assert resp.status_code == 401
 
 
 @pytest.mark.asyncio
-async def test_rag_with_auth(async_client):
-    # Login first
+async def test_rag_with_auth(async_client, override_rag_service):
+    # Login
     login = await async_client.post(
         "/auth/login",
         json={"username": "admin", "password": "admin123"},
     )
     token = login.json()["access_token"]
 
-    # Call RAG with token
+    # Call RAG
     resp = await async_client.post(
         "/rag/answer",
         headers={"Authorization": f"Bearer {token}"},
@@ -28,4 +29,4 @@ async def test_rag_with_auth(async_client):
     )
 
     assert resp.status_code == 200
-    assert "answer" in resp.json()
+    assert resp.json()["answer"] == "This is a mocked answer"

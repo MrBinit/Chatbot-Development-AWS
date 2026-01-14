@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+from functools import lru_cache
 
 class Settings(BaseSettings):
     OPENSEARCH_COLLECTION_ENDPOINT: str
@@ -8,9 +8,10 @@ class Settings(BaseSettings):
     AUTH_SECRET_KEY: str
 
     model_config = SettingsConfigDict(
-        env_file=None,        
+        env_file=None,
         case_sensitive=True
     )
 
-
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

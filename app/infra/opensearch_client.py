@@ -1,13 +1,16 @@
 import boto3
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
-from app.core.config import settings
+from app.core.config import get_settings
+
 from app.core.config_loader import load_app_config
+
 
 app_config = load_app_config()
 AWS_REGION = app_config["aws"]["region"]
 
 def get_opensearch_client() -> OpenSearch:
+    settings = get_settings()
     session = boto3.Session()
     credentials = session.get_credentials()
 
