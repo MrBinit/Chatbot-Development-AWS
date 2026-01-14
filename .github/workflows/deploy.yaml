@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write
+  contents: read
+  
 env:
   ECR_REPO: chatbot-api
   IMAGE_TAG: latest
